@@ -1,8 +1,7 @@
 import os
-
 import cv2
 import numpy as np
-from imutils import resize
+
 
 IMAGE_EXTENSIONS = ('.png', '.jpg', '.jpeg', '.bmp', '.tiff')
 

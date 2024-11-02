@@ -35,8 +35,7 @@ if __name__ == '__main__':
 
     detector = LicencePlateDetector(weights_path, app_path)
 
-
-    images_path =  '/Users/yudkin/.flamingo/Applications/video_tracker/77'
+    images_path =  '/Users/yudkin/.flamingo/Applications/video_tracker/65'
 
     for image_path in tqdm(get_images_from_path(images_path)):
         detector.detect(image_path)
