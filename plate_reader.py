@@ -1,3 +1,5 @@
+import argparse
+
 import cv2
 import re
 import easyocr
@@ -26,6 +28,8 @@ class PlateReader:
 
         license_plate = resize_image(license_plate)
         license_plate = cv2.cvtColor(license_plate, cv2.COLOR_BGR2GRAY)
+        # Apply Gaussian blur to reduce noise
+        license_plate = cv2.GaussianBlur(license_plate, (3, 3), 0)
         # perform ocr
         ocr_result = self._reader.readtext(license_plate)
 
@@ -68,9 +72,13 @@ class PlateReader:
 
 
 if __name__ == '__main__':
-    images_path = '/Users/yudkin/.flamingo/Applications/plate_detection'
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--images_path', type=str, help='path to the images of the plate')
+    args = parser.parse_args()
+
+
     p = PlateReader()
-    final_result = p.read_license_plate_multiple_images(images_path)
+    final_result = p.read_license_plate_multiple_images(args.images_path)
     print("Most likely result:", final_result)
 
 
