@@ -19,7 +19,7 @@ class VehicleDetectionPipeline:
     @property
     def annotated_video_path(self):
         file_name = os.path.basename(self._video_path)
-        return os.path.join(app_path, file_name)
+        return os.path.join(self._base_path, file_name)
 
     def _perform_detection(self, frame: np.ndarray):
         results = self._det_model.track(frame, persist=True, tracker='botsort.yaml', iou=0.2, verbose=False)
@@ -31,10 +31,9 @@ class VehicleDetectionPipeline:
 
         return boxes, track_ids, conf, cls_ids, annotated_frame
 
-    @staticmethod
-    def _save_detection(frame: np.ndarray, box: list, track_id: int, frame_id: int):
+    def _save_detection(self, frame: np.ndarray, box: list, track_id: int, frame_id: int):
         cropped_image = crop_image(frame, box)
-        image_path = os.path.join(app_path, str(track_id))
+        image_path = os.path.join(self._base_path, str(track_id))
         if not os.path.exists(image_path):
             os.makedirs(image_path)
 
@@ -42,7 +41,8 @@ class VehicleDetectionPipeline:
         cv2.imwrite(filename, cropped_image)
 
 
-    def detect_cars_on_road(self):
+    def detect_cars_on_road(self) -> list:
+        detected_car_ids = set()
         # Open the Video File
         cap = cv2.VideoCapture(self._video_path)
         if not cap.isOpened():
@@ -63,6 +63,7 @@ class VehicleDetectionPipeline:
 
             for track_id, box in zip(track_ids, boxes):
                 self._save_detection(frame, box, track_id, frame_count)
+                detected_car_ids.add(track_id)
 
             video_writer.write(annotated_frame)
 
@@ -72,8 +73,7 @@ class VehicleDetectionPipeline:
         cv2.destroyAllWindows()
         print(f'Annotated video location {self.annotated_video_path}')
 
-
-
+        return sorted(detected_car_ids)
 
 
 if __name__ == '__main__':
@@ -83,10 +83,12 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
 
-
-
     v = VehicleDetectionPipeline(args.video_path, app_path)
-    v.detect_cars_on_road()
+    detected_car_ids = v.detect_cars_on_road()
+    print(detected_car_ids)
+
+
+
 
 
 

@@ -14,3 +14,7 @@ def get_app_path(app_name: str) -> str:
 
     return app_path
 
+def get_subfolders(folder_path: str) -> list[str]:
+    subfolders = [os.path.join(folder_path, d) for d in os.listdir(folder_path) if os.path.isdir(os.path.join(folder_path, d))]
+    subfolders = sorted(subfolders)
+    return subfolders
